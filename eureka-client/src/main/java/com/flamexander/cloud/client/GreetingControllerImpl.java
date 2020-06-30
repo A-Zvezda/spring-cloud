@@ -1,5 +1,7 @@
 package com.flamexander.cloud.client;
 
+import com.flamexander.cloud.client.repositories.CategoryRepository;
+import com.flamexander.cloud.client.services.CategoryService;
 import com.netflix.discovery.EurekaClient;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,12 +11,30 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+import static java.util.stream.Collectors.toCollection;
 
 @RestController
 public class GreetingControllerImpl implements GreetingController {
     @Autowired
     @Lazy
     private EurekaClient eurekaClient;
+
+    private TestRepository repository;
+
+    public GreetingControllerImpl(@Autowired TestRepository repository) {
+        this.repository = repository;
+    }
+
+    private CategoryService categoryService;
+
+    @Autowired
+    public void setCategoryRepository(@Autowired CategoryService categoryService) {
+        this.categoryService = categoryService;
+    }
 
     ExcelReader excelReader;
 
@@ -46,7 +66,10 @@ public class GreetingControllerImpl implements GreetingController {
 //            e.printStackTrace();
 //        }
 //        return "";
-        return "hello EurekaClient";
+
+        List<ProductDTO> products = repository.getProducts(1).stream().collect(toCollection(ArrayList::new));
+         System.out.println(categoryService.getCategoryById(1L).toString() + "aaaaaaaaaaaaa");
+        return products.get(0).getTitle();
     }
 
     @Override
